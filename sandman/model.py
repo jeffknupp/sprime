@@ -123,25 +123,6 @@ class Model(object):
             if isinstance(result_dict[column], Decimal):
                 result_dict[column] = str(result_dict[column])
         result_dict['links'] = self.links()
-        for foreign_key in self.__table__.foreign_keys:
-            column_name = foreign_key.column.name
-            column_value = getattr(self, column_name, None)
-            if column_value:
-                table = foreign_key.column.table.name
-                with app.app_context():
-                    endpoint = current_app.class_references[table]
-                    session = db.session()
-                    resource = session.query(endpoint).get(column_value)
-                if depth > 0:
-                    result_dict.update({
-                        'rel': endpoint.__name__,
-                        endpoint.__name__.lower(): resource.as_dict(depth - 1)
-                        })
-                else:
-                    result_dict[
-                        endpoint.__name__.lower() + '_url'] = '/{}/{}'.format(
-                        endpoint.__name__, column_value)
-
         result_dict['self'] = self.resource_uri()
         return result_dict
 

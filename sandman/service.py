@@ -1,3 +1,6 @@
+"""This module contains the base class for all "services". A service is simply
+the REST endpoints for a given ORM model (i.e. database table)."""
+
 from flask import jsonify, request, make_response
 from flask.views import MethodView
 
@@ -39,7 +42,6 @@ class Service(MethodView):
         if resource:
             return self._no_content_response()
         instance = self.__model__(**request.json)
-        self.record_action('CREATE')
         db.session.add(instance)
         db.session.commit()
         return jsonify(instance.as_dict())
@@ -47,7 +49,6 @@ class Service(MethodView):
     def delete(self, resource_id):
         """Return response to HTTP DELETE request."""
         instance = self.resource(resource_id)
-        self.record_action('DELETE')
         db.session.delete(instance)
         db.session.commit()
         return self._no_content_response()
@@ -57,10 +58,8 @@ class Service(MethodView):
         instance = self.resource(resource_id)
         if instance is None:
             instance = self.__model__(**request.json)
-            self.record_action('CREATE')
         else:
             instance.from_dict(request.json)
-            self.record_action('UPDATE')
         db.session.add(instance)
         db.session.commit()
         return jsonify(instance.as_dict())
