@@ -17,6 +17,8 @@ class Service(MethodView):
 
     def get(self, resource_id=None):
         """Return response to HTTP GET request."""
+        if 'meta' in request.url:
+            return self.meta()
         if resource_id is None:
             return self.all_resources()
         else:
@@ -44,7 +46,7 @@ class Service(MethodView):
         instance = self.__model__(**request.json)
         db.session.add(instance)
         db.session.commit()
-        return jsonify(instance.as_dict())
+        return self._created_response(instance)
 
     def delete(self, resource_id):
         """Return response to HTTP DELETE request."""
@@ -56,10 +58,8 @@ class Service(MethodView):
     def put(self, resource_id):
         """Return response to HTTP PUT request."""
         instance = self.resource(resource_id)
-        if instance is None:
-            instance = self.__model__(**request.json)
-        else:
-            instance.from_dict(request.json)
+        instance.replace(request.json)
+        setattr(instance, instance.primary_key(), resource_id)
         db.session.add(instance)
         db.session.commit()
         return jsonify(instance.as_dict())
@@ -76,6 +76,9 @@ class Service(MethodView):
         """Return resource represented by this *resource_id*."""
         return db.session.query(self.__model__).get(resource_id)
 
+    def meta(self):
+        return jsonify(self.__model__.meta())
+
     @staticmethod
     def _no_content_response():
         """Return an HTTP 204 "No Content" response."""
@@ -86,7 +89,7 @@ class Service(MethodView):
     @staticmethod
     def _created_response(resource):
         """Return an HTTP 201 "Created" response."""
-        response = jsonify(resource)
+        response = jsonify(resource.as_dict())
         response.status_code = 201
         return response
 
@@ -105,3 +108,7 @@ class Service(MethodView):
                 pk=primary_key, pk_type=primary_key_type),
             view_func=view_func,
             methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+        app.add_url_rule(
+            '{resource}/meta'.format(resource=cls.__url__),
+            view_func=view_func,
+            methods=['GET'])

@@ -1,11 +1,22 @@
 """Sandman allows you to automatically create a REST API service from a legacy
 database."""
 
+from flask import jsonify
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative import DeferredReflection
 
 from sandman.model import db, Model
+from sandman.exception import (
+    BadRequestException,
+    ForbiddenException,
+    NotAcceptableException,
+    NotFoundException,
+    ConflictException,
+    ServerErrorException,
+    NotImplementedException,
+    ServiceUnavailableException,
+    )
 from sandman.service import Service
 
 __version__ = '0.0.1'
@@ -22,7 +33,8 @@ def reflect_all_app(database_uri):
 
     """
 
-    from sandman.application import app
+    from sandman.application import get_app
+    app = get_app()
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     db.init_app(app)
     with app.app_context():
@@ -39,4 +51,20 @@ def reflect_all_app(database_uri):
                 })
             app.class_references[cls.__table__.name] = cls
             service_cls.register_service(app)
+
+    @app.errorhandler(BadRequestException)
+    @app.errorhandler(ForbiddenException)
+    @app.errorhandler(NotAcceptableException)
+    @app.errorhandler(NotFoundException)
+    @app.errorhandler(ConflictException)
+    @app.errorhandler(ServerErrorException)
+    @app.errorhandler(NotImplementedException)
+    @app.errorhandler(ServiceUnavailableException)
+    def handle_application_error(error):
+        """Handler used to send JSON error messages rather than default HTML
+        ones."""
+        response = jsonify(error.to_dict())
+        response.status_code = error.code
+        return response
+
     return app

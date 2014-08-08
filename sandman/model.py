@@ -2,10 +2,7 @@
 a table in the database that should be modeled as a resource."""
 from decimal import Decimal
 
-from flask import current_app
 from flask.ext.sqlalchemy import SQLAlchemy
-
-from sandman.application import app
 
 db = SQLAlchemy()
 
@@ -57,13 +54,7 @@ class Model(object):
         :rtype: string
 
         """
-        endpoint = ''
-        if cls.__endpoint__ is not None:
-            return cls.__endpoint__
-        elif cls.__from_class__ is not None:
-            endpoint = cls.__from_class__.__name__.lower()
-        else:
-            endpoint = cls.__table__.name.lower()
+        endpoint = cls.__table__.name.lower()
         if not endpoint.endswith('s'):
             endpoint += 's'
         return endpoint
@@ -85,8 +76,6 @@ class Model(object):
 
         """
 
-        if cls.__from_class__:
-            cls = cls.__from_class__
         return cls.__table__.primary_key.columns.values()[0].name
 
     def links(self):
@@ -102,10 +91,8 @@ class Model(object):
             column_value = getattr(self, column, None)
             if column_value:
                 table = foreign_key.column.table.name
-                with app.app_context():
-                    endpoint = current_app.class_references[table]
                 links.append({'rel': 'related', 'uri': '/{}/{}'.format(
-                    endpoint.__name__, column_value)})
+                    table, column_value)})
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
 
@@ -158,13 +145,8 @@ class Model(object):
     def meta(cls):
         """Return a dictionary containing meta-information about the given
         resource."""
-        if getattr(cls, '__from_class__', None) is not None:
-            cls = cls.__from_class__
         attribute_info = {}
         for name, value in cls.__table__.columns.items():
             attribute_info[name] = str(value.type).lower()
 
         return {cls.__name__: attribute_info}
-
-    def __str__(self):
-        return str(getattr(self, self.primary_key()))
