@@ -6,6 +6,6 @@ app = None
 
 def get_app():
     """Return the application instance."""
-    global app
+    global app  # pylint: disable=global-statement
     app = Flask(__name__)
     return app

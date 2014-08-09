@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from flask.ext.sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+db = SQLAlchemy()  # pylint: disable=invalid-name
 
 
 class Model(object):
@@ -96,11 +96,10 @@ class Model(object):
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
 
-    def as_dict(self, depth=0):
+    def as_dict(self):
         """Return a dictionary containing only the attributes which map to
         an instance's database columns.
 
-        :param int depth: Maximum depth to recurse subobjects
         :rtype: dict
 
         """

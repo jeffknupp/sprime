@@ -24,7 +24,8 @@ from sandman.service import Service
 __version__ = '0.0.1'
 __all__ = ['Model', 'reflect_all_app']
 
-Model = automap_base(declarative_base(cls=(Model, db.Model, DeferredReflection)))
+Model = automap_base(
+    declarative_base(cls=(Model, db.Model, DeferredReflection)))
 
 
 def reflect_all_app(database_uri):
@@ -42,8 +43,9 @@ def reflect_all_app(database_uri):
     with app.app_context():
         admin = Admin(app)
         app.class_references = {}
-        Model.prepare(db.engine, reflect=True)
-        for cls in Model.classes:
+        Model.prepare(  # pylint:disable=maybe-no-member
+            db.engine, reflect=True)
+        for cls in Model.classes:  # pylint:disable=maybe-no-member
             service_cls = type(
                 str(cls.__table__.name) + 'Service',
                 (Service,),
@@ -64,7 +66,7 @@ def reflect_all_app(database_uri):
     @app.errorhandler(ServerErrorException)
     @app.errorhandler(NotImplementedException)
     @app.errorhandler(ServiceUnavailableException)
-    def handle_application_error(error):
+    def handle_application_error(error):  # pylint:disable=unused-variable
         """Handler used to send JSON error messages rather than default HTML
         ones."""
         response = jsonify(error.to_dict())

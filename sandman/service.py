@@ -43,7 +43,8 @@ class Service(MethodView):
         # resource already exists; don't create it again
         if resource:
             return self._no_content_response()
-        instance = self.__model__(**request.json)
+        instance = self.__model__(  # pylint: disable=not-callable
+            **request.json)
         db.session.add(instance)
         db.session.commit()
         return self._created_response(instance)
@@ -77,6 +78,8 @@ class Service(MethodView):
         return db.session.query(self.__model__).get(resource_id)
 
     def meta(self):
+        """Return a description of the resource's fields and their associated
+        types."""
         return jsonify(self.__model__.meta())
 
     @staticmethod
@@ -94,9 +97,10 @@ class Service(MethodView):
         return response
 
     @classmethod
-    def register_service(cls, app, primary_key='resource_id', primary_key_type='int'):
+    def register_service(
+            cls, app, primary_key='resource_id', primary_key_type='int'):
         """Register an API service endpoint."""
-        view_func = cls.as_view(cls.__endpoint__)
+        view_func = cls.as_view(cls.__endpoint__)  # pylint: disable=no-member
         app.add_url_rule(
             cls.__url__, defaults={primary_key: None},
             view_func=view_func,
