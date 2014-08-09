@@ -1,6 +1,7 @@
 """Sandman allows you to automatically create a REST API service from a legacy
 database."""
 
+# Third-party imports
 from flask import jsonify
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
@@ -8,6 +9,7 @@ from sqlalchemy.ext.declarative import DeferredReflection
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 
+# Application imports
 from sandman.model import db, Model
 from sandman.exception import (
     BadRequestException,

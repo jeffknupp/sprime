@@ -1,7 +1,10 @@
 """The Model class is meant to be the base class for user Models. It represents
 a table in the database that should be modeled as a resource."""
+
+# Standard library imports
 from decimal import Decimal
 
+# Third-party imports
 from flask.ext.sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()  # pylint: disable=invalid-name
