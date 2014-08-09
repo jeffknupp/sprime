@@ -1,5 +1,7 @@
 .PHONY: test,build,clean,docs
 
+CURDIR = `pwd`
+
 build: clean
 	virtualenv venv && \
 	source venv/bin/activate && \
@@ -14,6 +16,9 @@ docs: build
 
 test-full:
 	pylint --rcfile=.pylintrc sandman
+
+examples: build
+	PYTHONPATH=${CURDIR} python examples/runserver.py 
 
 clean:
 	rm -rf htmlcov
