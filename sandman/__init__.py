@@ -5,6 +5,8 @@ from flask import jsonify
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative import DeferredReflection
+from flask.ext.admin import Admin
+from flask.ext.admin.contrib.sqla import ModelView
 
 from sandman.model import db, Model
 from sandman.exception import (
@@ -38,6 +40,7 @@ def reflect_all_app(database_uri):
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     db.init_app(app)
     with app.app_context():
+        admin = Admin(app)
         app.class_references = {}
         Model.prepare(db.engine, reflect=True)
         for cls in Model.classes:
@@ -49,6 +52,7 @@ def reflect_all_app(database_uri):
                     '__endpoint__': str(cls.__table__.name),
                     '__url__': '/' + str(cls.__table__.name).lower()
                 })
+            admin.add_view(ModelView(cls, db.session))
             app.class_references[cls.__table__.name] = cls
             service_cls.register_service(app)
 
