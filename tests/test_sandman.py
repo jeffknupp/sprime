@@ -11,13 +11,14 @@ import pytest
 sys.path.append(os.path.join(os.path.dirname(__file__), os.path.pardir))
 
 print sys.path
-from sandman import reflect_all_app
+from sandman import reflect_all_app  # pylint: disable=no-name-in-module
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.yield_fixture(scope='function')  # pylint: disable=no-member
 def app():
     """Return the test application instance."""
-    shutil.copy2(os.path.join('tests', 'data', 'chinook.sqlite3'), 'chinook.sqlite3')
+    shutil.copy2(
+        os.path.join('tests', 'data', 'chinook.sqlite3'), 'chinook.sqlite3')
     application = reflect_all_app('sqlite+pysqlite:///chinook.sqlite3')
     application.testing = True
 
@@ -25,10 +26,12 @@ def app():
 
     os.unlink('chinook.sqlite3')
 
-@pytest.yield_fixture(scope='function')
+
+@pytest.yield_fixture(scope='function')  # pylint: disable=no-member
 def full_app():
     """Return the test application instance."""
-    shutil.copy2(os.path.join('tests', 'data', 'chinook.sqlite3'), 'chinook.sqlite3')
+    shutil.copy2(
+        os.path.join('tests', 'data', 'chinook.sqlite3'), 'chinook.sqlite3')
     application = reflect_all_app('sqlite+pysqlite:///chinook.sqlite3')
     application.testing = True
 
@@ -37,8 +40,7 @@ def full_app():
     os.unlink('chinook.sqlite3')
 
 
-
-def test_get_resource(app):
+def test_get_resource(app):  # pylint: disable=redefined-outer-name
     """Can we GET a simple resource?"""
     response = app.get('/artist/1')
 
@@ -47,7 +49,7 @@ def test_get_resource(app):
     assert resource['Name'] == 'AC/DC'
 
 
-def test_get_collection(app):
+def test_get_collection(app):  # pylint: disable=redefined-outer-name
     """Can we GET a collection of resources?"""
     response = app.get('/artist')
 
@@ -56,7 +58,7 @@ def test_get_collection(app):
     assert len(collection['resources']) == 275
 
 
-def test_add_resource(app):
+def test_add_resource(app):  # pylint: disable=redefined-outer-name
     """Can we POST a new resource?"""
     response = app.post(
         '/artist',
@@ -72,7 +74,7 @@ def test_add_resource(app):
     assert resource['ArtistId'] == 276
 
 
-def test_delete_resource(app):
+def test_delete_resource(app):  # pylint: disable=redefined-outer-name
     """Can we DELETE a resource?"""
     response = app.delete('/album/1')
 
@@ -83,7 +85,7 @@ def test_delete_resource(app):
     assert response.status_code == 404
 
 
-def test_patch_resource(app):
+def test_patch_resource(app):  # pylint: disable=redefined-outer-name
     """Can we PATCH a resource?"""
     response = app.patch(
         '/artist/275',
@@ -99,7 +101,7 @@ def test_patch_resource(app):
     assert resource['Name'] == 'Jeff Knupp'
 
 
-def test_put_resource(app):
+def test_put_resource(app):  # pylint: disable=redefined-outer-name
     """Can we PUT a resource?"""
     response = app.put(
         '/track/1',
@@ -121,7 +123,7 @@ def test_put_resource(app):
     assert resource['Bytes'] is None
 
 
-def test_meta_endpoint(app):
+def test_meta_endpoint(app):  # pylint: disable=redefined-outer-name
     """Can we get the meta-endpoint of a resource?"""
     response = app.get('/artist/meta')
 
@@ -130,7 +132,7 @@ def test_meta_endpoint(app):
     assert resource_description['Artist']['ArtistId'] == 'integer'
 
 
-def test_pagination(app):
+def test_pagination(app):  # pylint: disable=redefined-outer-name
     """Can we properly paginate a collection?"""
     response = app.get('/artist?page=1')
 
@@ -139,7 +141,7 @@ def test_pagination(app):
     assert len(collection['resources']) == 20
 
 
-def test_post_existing_resource(app):
+def test_post_existing_resource(app):  # pylint: disable=redefined-outer-name
     """Do we properly ignore POSTing an existing resource?"""
     response = app.post(
         '/artist',
