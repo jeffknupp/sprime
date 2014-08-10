@@ -1,6 +1,6 @@
 .PHONY: test,build,clean,docs
 
-CURDIR = `pwd`
+CURDIR = $(shell pwd)
 
 build: clean
 	virtualenv venv && \
@@ -8,7 +8,7 @@ build: clean
 	pip install -r requirements.txt
 
 test: build
-	PYTHONPATH=`pwd`:${PYTHONPATH} py.test --cov=sandman --strict --verbose tests && \
+	py.test --cov=sandman --strict --verbose tests && \
 	coverage html
 
 docs: build

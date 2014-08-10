@@ -1,10 +1,16 @@
 """Main test class for sandman"""
+from __future__ import absolute_import
+import sys
+
 import json
 import os
 import shutil
 
 import pytest
 
+sys.path.append(os.path.join(os.path.dirname(__file__), os.path.pardir))
+
+print sys.path
 from sandman import reflect_all_app
 
 
