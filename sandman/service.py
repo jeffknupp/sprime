@@ -4,10 +4,11 @@ the REST endpoints for a given ORM model (i.e. database table)."""
 # Third-party imports
 from flask import jsonify, request, make_response
 from flask.views import MethodView
+from sqlalchemy.exc import IntegrityError
 
 # Application imports
 from sandman.model import db
-from sandman.exception import NotFoundException
+from sandman.exception import NotFoundException, BadRequestException
 
 
 class Service(MethodView):
@@ -65,7 +66,10 @@ class Service(MethodView):
         instance = self.__model__(  # pylint: disable=not-callable
             **request.json)
         db.session.add(instance)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            raise BadRequestException
         return self._created_response(instance)
 
     def delete(self, resource_id):

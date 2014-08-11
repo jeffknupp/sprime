@@ -182,3 +182,14 @@ def test_custom_class_mapped_model(custom_app):
     response = custom_app.get('/some_model/1')
 
     assert response.status_code == 200
+
+
+def test_custom_class_error(custom_app):
+    """Do errors for custom class apps work as for fully-reflected apps?"""
+    response = custom_app.post(
+        '/track',
+        data=json.dumps({'Name': 'Awesome Track'}),
+        headers={'Content-type': 'application/json'},
+        )
+
+    assert response.status_code == 400

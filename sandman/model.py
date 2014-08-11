@@ -13,8 +13,9 @@ db = SQLAlchemy()  # pylint: disable=invalid-name
 class Model(object):
     """A mixin class containing the majority of the RESTful API functionality.
 
-    :class:`sandman.model.Model` is the base class of `:class:`sandman.Model`,
-    from which user models are derived.
+    :class:`sandman.Model` is the base class from which user models
+    are derived.
+
     """
 
     __endpoint__ = None

@@ -9,7 +9,6 @@ class SomeModel(db.Model):
 
 class Track(Model):
     __tablename__ = 'Track'
-    __methods__ = ('POST')
 
     def __str__(self):
         return self.Name
