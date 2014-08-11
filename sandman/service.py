@@ -68,8 +68,8 @@ class Service(MethodView):
         db.session.add(instance)
         try:
             db.session.commit()
-        except IntegrityError:
-            raise BadRequestException
+        except IntegrityError as exc:
+            raise BadRequestException(exc.message)
         return self._created_response(instance)
 
     def delete(self, resource_id):

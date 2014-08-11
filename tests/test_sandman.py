@@ -193,3 +193,4 @@ def test_custom_class_error(custom_app):
         )
 
     assert response.status_code == 400
+    assert 'IntegrityError' in response.get_data(as_text=True)
