@@ -48,7 +48,8 @@ class Service(MethodView):
             resources = self.__model__.query.paginate(
                 int(request.args['page'])).items
         return jsonify(
-            {'resources': [resource.as_dict() for resource in resources]})
+            {self.__model__.__top_level_json_name__: [
+                resource.as_dict() for resource in resources]})
 
     def post(self):
         """Return response to HTTP POST request.

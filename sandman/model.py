@@ -30,10 +30,10 @@ class Model(object):
     Default: None
     """
 
-    __top_level_json_name__ = None
+    __top_level_json_name__ = 'resources'
     """The top level json text to output for this class
 
-    Default: 'resources'
+    Default: ``resources``
     """
 
     __methods__ = ('GET', 'POST', 'PATCH', 'DELETE', 'PUT')
@@ -106,13 +106,12 @@ class Model(object):
         :rtype: dict
 
         """
-        result_dict = {}
-        for column in self.__table__.columns.keys():
-            result_dict[column] = getattr(self, column, None)
+        result_dict = {column: getattr(self, column, None) for column in
+                       self.__table__.columns.keys()}
+        for column in result_dict:
             if isinstance(result_dict[column], Decimal):
                 result_dict[column] = str(result_dict[column])
-        result_dict['links'] = self.links()
-        result_dict['self'] = self.resource_uri()
+        result_dict['_links'] = self.links()
         return result_dict
 
     def from_dict(self, dictionary):
@@ -124,6 +123,7 @@ class Model(object):
             the :class:`sandman.model.Model`'s underlying database table.
 
         """
+
         for column in self.__table__.columns.keys():
             value = dictionary.get(column, None)
             if value:
@@ -139,6 +139,7 @@ class Model(object):
             :class:`sandman.model.Model`'s underlying database table.
 
         """
+
         for column in self.__table__.columns.keys():
             setattr(self, column, None)
         self.from_dict(dictionary)
