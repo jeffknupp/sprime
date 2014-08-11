@@ -24,8 +24,8 @@ from sandman.exception import (
 from sandman.service import Service
 
 __version__ = '0.0.1'
-__all__ = ['Model', 'reflect_all_app']
 
+SandmanModel = Model
 Model = declarative_base(cls=(Model, db.Model, DeferredReflection))
 AutomapModel = automap_base(Model)
 _SERVICE_CLASSES = []
@@ -34,6 +34,8 @@ _SERVICE_CLASSES = []
 def register(classes):
     """Register an iterable of models to be REST-ified."""
     for cls in classes:
+        if not getattr(cls, 'links', None):
+            cls = type(cls.__name__ + 'Model', (cls, SandmanModel), {})
         service_cls = type(
             str(cls.__table__.name) + 'Service',
             (Service,),

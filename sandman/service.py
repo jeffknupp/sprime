@@ -159,9 +159,6 @@ class Service(MethodView):
                                      field
 
         """
-        if not hasattr(cls.__model__, '__methods__'):
-            cls.__model__.__methods__ = (
-                'GET', 'POST', 'PATCH', 'PUT', 'DELETE')
         view_func = cls.as_view(cls.__endpoint__)  # pylint: disable=no-member
         methods = set(cls.__model__.__methods__)  # pylint: disable=no-member
         if 'GET' in methods:  # pylint: disable=no-member

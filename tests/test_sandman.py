@@ -175,3 +175,10 @@ def test_custom_class_app_get(custom_app):
     response = custom_app.get('/artist/1')
 
     assert response.status_code == 200
+
+
+def test_custom_class_mapped_model(custom_app):
+    """Can we successfully GET a pre-existing SQLAlchemy model?"""
+    response = custom_app.get('/some_model/1')
+
+    assert response.status_code == 200
