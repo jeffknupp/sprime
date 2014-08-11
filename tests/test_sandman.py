@@ -11,7 +11,10 @@ import pytest
 sys.path.append(os.path.join(os.path.dirname(__file__), os.path.pardir))
 
 print sys.path
-from sandman import reflect_all_app  # pylint: disable=no-name-in-module
+from sandman import (
+    reflect_all_app,
+    custom_class_app
+    )
 
 
 @pytest.yield_fixture(scope='function')  # pylint: disable=no-member
@@ -36,6 +39,20 @@ def full_app():
     application.testing = True
 
     yield application
+
+    os.unlink('chinook.sqlite3')
+
+
+@pytest.yield_fixture(scope='function')  # pylint: disable=no-member
+def custom_app():
+    """Return the test application instance."""
+    shutil.copy2(
+        os.path.join('tests', 'data', 'chinook.sqlite3'), 'chinook.sqlite3')
+    import models
+    application = custom_class_app('sqlite+pysqlite:///chinook.sqlite3')
+    application.testing = True
+
+    yield application.test_client()
 
     os.unlink('chinook.sqlite3')
 
@@ -152,3 +169,10 @@ def test_post_existing_resource(app):  # pylint: disable=redefined-outer-name
         headers={'Content-type': 'application/json'})
 
     assert response.status_code == 204
+
+
+def test_custom_class_app_get(custom_app):
+    """Can we successfully get a resource using custom models?"""
+    response = custom_app.get('/artist/1')
+
+    assert response.status_code == 200

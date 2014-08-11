@@ -1,6 +1,7 @@
-from sandman import reflect_all_app
+import models
+from sandman import custom_class_app
 
-app = reflect_all_app('sqlite+pysqlite:///examples/db.sqlite3')
+app = custom_class_app('sqlite+pysqlite:///examples/db.sqlite3')
 
 def main():
     app.run(debug=True)

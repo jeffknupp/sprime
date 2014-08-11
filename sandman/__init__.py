@@ -26,8 +26,45 @@ from sandman.service import Service
 __version__ = '0.0.1'
 __all__ = ['Model', 'reflect_all_app']
 
-Model = automap_base(
-    declarative_base(cls=(Model, db.Model, DeferredReflection)))
+Model = declarative_base(cls=(Model, db.Model, DeferredReflection))
+AutomapModel = automap_base(Model)
+_SERVICE_CLASSES = []
+
+
+def register(classes):
+    """Register an iterable of models to be REST-ified."""
+    for cls in classes:
+        service_cls = type(
+            str(cls.__table__.name) + 'Service',
+            (Service,),
+            {
+                '__model__': cls,
+                '__endpoint__': str(cls.__table__.name),
+                '__url__': '/' + str(cls.__table__.name).lower()
+            })
+        _SERVICE_CLASSES.append(service_cls)
+
+
+def custom_class_app(database_uri):
+    """Return a Flask application object with a service created for all of
+    the classes in *classes*.
+
+    :param str database_uri: The SQLAlchemy database URI to reflect
+    :param list classes: A list of SQLAlchemy model classes to register
+
+    """
+    from sandman.application import get_app
+    app = get_app()
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+    db.init_app(app)
+    with app.app_context():
+        Model.prepare(  # pylint:disable=maybe-no-member
+            db.engine)
+        admin = Admin(app)
+        for cls in _SERVICE_CLASSES:
+            cls.register_service(app)
+            admin.add_view(ModelView(cls.__model__, db.session))
+    return app
 
 
 def reflect_all_app(database_uri):
@@ -45,9 +82,9 @@ def reflect_all_app(database_uri):
     with app.app_context():
         admin = Admin(app)
         app.class_references = {}
-        Model.prepare(  # pylint:disable=maybe-no-member
+        AutomapModel.prepare(  # pylint:disable=maybe-no-member
             db.engine, reflect=True)
-        for cls in Model.classes:  # pylint:disable=maybe-no-member
+        for cls in AutomapModel.classes:  # pylint:disable=maybe-no-member
             service_cls = type(
                 str(cls.__table__.name) + 'Service',
                 (Service,),
