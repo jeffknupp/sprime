@@ -16,6 +16,7 @@ class Track(Model):
 
 class Artist(Model):
     __tablename__ = 'Artist'
+    __top_level_json_name__ = 'singers'
 
     def __str__(self):
         return self.Name

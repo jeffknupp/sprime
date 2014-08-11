@@ -194,3 +194,11 @@ def test_custom_class_error(custom_app):
 
     assert response.status_code == 400
     assert 'IntegrityError' in response.get_data(as_text=True)
+
+
+def test_custom_json_name_honored(custom_app):
+    """Do we honor the custom JSON name if a class specifies it?"""
+    response = custom_app.get('/artist')
+
+    collection = json.loads(response.get_data(as_text=True))
+    assert len(collection['singers']) == 275
