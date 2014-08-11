@@ -10,7 +10,6 @@ import pytest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), os.path.pardir))
 
-print sys.path
 from sandman import (
     reflect_all_app,
     custom_class_app
