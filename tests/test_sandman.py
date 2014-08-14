@@ -202,3 +202,21 @@ def test_custom_json_name_honored(custom_app):
 
     collection = json.loads(response.get_data(as_text=True))
     assert len(collection['singers']) == 275
+
+
+def test_etag_response(app):
+    """Do we generate the proper ETag value for a resource?"""
+    response = app.get('/artist/1')
+    assert response.headers['ETag'].strip(
+        '"') == '8ccd1a6759c8491c9288adf724814f4b'
+
+
+def test_etag_if_none_match_unmodified(app):
+    """Do we return an HTTP 304 with If-None-Match if the resource hasn't
+    been modified?"""
+    response = app.get(
+        '/artist/1',
+        headers={'If-None-Match': '"8ccd1a6759c8491c9288adf724814f4b"'}
+        )
+
+    assert response.status_code == 304

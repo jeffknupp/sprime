@@ -8,12 +8,13 @@ from sqlalchemy.exc import IntegrityError
 
 # Application imports
 from sandman.model import db
+from sandman.decorators import etag
 from sandman.exception import NotFoundException, BadRequestException
 
 
 class Service(MethodView):
     """Base class for all resources.
-    
+
     A ``Service`` is a set of HTTP endpoints and behavior attached to a
     :class:`sandmand.Model`. Given a :class:`sandman.Model` ORM model named,
     say, ``Student``, creating an associated ``StudentService`` class that
@@ -44,6 +45,7 @@ class Service(MethodView):
     __url__ = '/'
     __model__ = None
 
+    @etag
     def get(self, resource_id=None):
         """Return response to HTTP GET request.
 
@@ -74,7 +76,7 @@ class Service(MethodView):
             {self.__model__.__top_level_json_name__: [
                 resource.as_dict() for resource in resources]})
 
-    def post(self):
+    def post(self, resource_id=None):
         """Return response to HTTP POST request.
 
         :rtype flask.Response:
@@ -88,9 +90,8 @@ class Service(MethodView):
         db.session.add(instance)
         try:
             db.session.commit()
-        except IntegrityError as e:
-            import sys
-            raise BadRequestException(str(e))
+        except IntegrityError as exception:
+            raise BadRequestException(str(exception))
         return self._created_response(instance)
 
     def delete(self, resource_id):
