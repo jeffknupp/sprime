@@ -4,6 +4,14 @@ sandman package
 Submodules
 ----------
 
+Module contents
+---------------
+
+.. automodule:: sandman
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 sandman.application module
 --------------------------
 
@@ -32,15 +40,6 @@ sandman.service module
 ----------------------
 
 .. automodule:: sandman.service
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: sandman
     :members:
     :undoc-members:
     :show-inheritance:

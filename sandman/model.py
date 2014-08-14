@@ -1,5 +1,6 @@
 """The Model class is meant to be the base class for user Models. It represents
 a table in the database that should be modeled as a resource."""
+# pylint: disable=pointless-string-statement
 
 # Standard library imports
 from decimal import Decimal
@@ -23,18 +24,21 @@ class Model(object):
     :class:`sandman.model.Model`'s endpoint.
 
     Default: __tablename__ in lowercase and pluralized
+
     """
 
     __tablename__ = None
     """The name of the database table this class should be mapped to
 
     Default: None
+
     """
 
     __top_level_json_name__ = 'resources'
     """The top level json text to output for this class
 
     Default: ``resources``
+
     """
 
     __methods__ = ('GET', 'POST', 'PATCH', 'DELETE', 'PUT')
@@ -42,6 +46,7 @@ class Model(object):
     this :class:`sandman.model.Model` supports.
 
     Default: ``('GET', 'POST', 'PATCH', 'DELETE', 'PUT')``
+
     """
 
     __table__ = None

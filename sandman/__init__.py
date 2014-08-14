@@ -1,5 +1,6 @@
 """Sandman allows you to automatically create a REST API service from a legacy
 database."""
+from __future__ import absolute_import
 
 # Third-party imports
 from flask import jsonify
@@ -60,7 +61,7 @@ def custom_class_app(database_uri):
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     db.init_app(app)
     with app.app_context():
-        Model.prepare(  # pylint:disable=maybe-no-member
+        Model.prepare(  # pylint:disable=no-member
             db.engine)
         admin = Admin(app)
         for cls in _SERVICE_CLASSES:

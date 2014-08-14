@@ -1,5 +1,6 @@
 """This module contains the base class for all "services". A service is simply
 the REST endpoints for a given ORM model (i.e. database table)."""
+# pylint: disable=pointless-string-statement
 
 # Third-party imports
 from flask import jsonify, request, make_response
@@ -13,7 +14,7 @@ from sandman.exception import NotFoundException, BadRequestException
 
 class Service(MethodView):
     """Base class for all resources.
-    
+
     A ``Service`` is a set of HTTP endpoints and behavior attached to a
     :class:`sandmand.Model`. Given a :class:`sandman.Model` ORM model named,
     say, ``Student``, creating an associated ``StudentService`` class that
@@ -40,9 +41,28 @@ class Service(MethodView):
         __url__: The base url for the service
         __model__: The associated ORM model (a :class:`sandman.Model` class)
     """
+
     __endpoint__ = ''
+    """The name given to the endpoint to be used internally in the Flask
+    application instance.
+
+    Default: ''
+    """
+
     __url__ = '/'
+    """The URL to which this endpoint service should be connected. Note that
+    :attr:`__url__` is used as the *base* of all URLs for the endpoint. The
+    endpoint registers more than one URL, however.
+
+    Default: '/'
+    """
+
     __model__ = None
+    """The associated SQLAlchemy model class deriving from
+    :class:`sandman.Model` or SQLAlchemy's :class:`DeclarativeBase`.
+
+    Default: None
+    """
 
     def get(self, resource_id=None):
         """Return response to HTTP GET request.
@@ -88,9 +108,8 @@ class Service(MethodView):
         db.session.add(instance)
         try:
             db.session.commit()
-        except IntegrityError as e:
-            import sys
-            raise BadRequestException(str(e))
+        except IntegrityError as exception:
+            raise BadRequestException(str(exception))
         return self._created_response(instance)
 
     def delete(self, resource_id):
