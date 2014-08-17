@@ -8,6 +8,7 @@ build: clean
 	pip install -r requirements.txt
 
 test: build
+	source venv/bin/activate && \
 	py.test --cov=sandman --strict --verbose tests && \
 	coverage html
 

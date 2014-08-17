@@ -5,34 +5,6 @@ import hashlib
 from flask import jsonify, request, make_response
 
 
-def cache_control(*directives):
-    """Add Cache-Control directives to the response headers.
-
-    :param list directives: Cache-Control directives to add
-    """
-    def decorator(func):
-        """The actual decorator function."""
-        @functools.wraps(func)
-        def wrapped(*args, **kwargs):
-            """Call the view function and add the Cache-Control directives to
-            the response."""
-            response = func(*args, **kwargs)
-            response = make_response(response)
-            response.headers['Cache-Control'] = ', '.join(directives)
-            return response
-        return wrapped
-    return decorator
-
-
-def no_cache(func):
-    """A decorator to mark that a view function's response should not be
-    cached.
-
-    :param func: view function
-    """
-    return cache_control('no-cache', 'no-store', 'max-age=0')(func)
-
-
 def etag(func):
     """Return a decorator that generates proper ETag values for a response.
 

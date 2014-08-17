@@ -211,6 +211,27 @@ def test_etag_response(app):
         '"') == '8ccd1a6759c8491c9288adf724814f4b'
 
 
+def test_etag_if_match(app):
+    """Do we return an HTTP 200 with If-Match if the resource hasn't
+    been modified?"""
+    response = app.get(
+        '/artist/1',
+        headers={'If-Match': '"8ccd1a6759c8491c9288adf724814f4b"'}
+        )
+
+    assert response.status_code == 200
+
+
+def test_etag_precondition_failed(app):
+    """Do we return an HTTP 412 with If-Match if the ETag isn't found?"""
+    response = app.get(
+        '/artist/1',
+        headers={'If-Match': '"ABC"'}
+        )
+
+    assert response.status_code == 412
+
+
 def test_etag_if_none_match_unmodified(app):
     """Do we return an HTTP 304 with If-None-Match if the resource hasn't
     been modified?"""
