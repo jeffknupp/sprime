@@ -208,15 +208,16 @@ def test_etag_response(app):
     """Do we generate the proper ETag value for a resource?"""
     response = app.get('/artist/1')
     assert response.headers['ETag'].strip(
-        '"') == '8ccd1a6759c8491c9288adf724814f4b'
+        '"') != ''
 
 
 def test_etag_if_match(app):
     """Do we return an HTTP 200 with If-Match if the resource hasn't
     been modified?"""
+    etag = get_etag(app, '/artist/1')
     response = app.get(
         '/artist/1',
-        headers={'If-Match': '"8ccd1a6759c8491c9288adf724814f4b"'}
+        headers={'If-Match': '"{}"'.format(etag)}
         )
 
     assert response.status_code == 200
@@ -235,9 +236,20 @@ def test_etag_precondition_failed(app):
 def test_etag_if_none_match_unmodified(app):
     """Do we return an HTTP 304 with If-None-Match if the resource hasn't
     been modified?"""
+    etag = get_etag(app, '/artist/1')
     response = app.get(
         '/artist/1',
-        headers={'If-None-Match': '"8ccd1a6759c8491c9288adf724814f4b"'}
+        headers={'If-None-Match': '"{}"'.format(etag)}
         )
 
     assert response.status_code == 304
+
+
+def get_etag(application, destination):
+    """Return the etag header value from the response to *destination*.
+
+    :param app: application object
+    :param str destination: URL to send request to
+    """
+    response = application.get(destination)
+    return response.headers['ETag'].strip('"')
